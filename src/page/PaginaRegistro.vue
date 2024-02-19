@@ -10,7 +10,7 @@
         <h2>Registrarse</h2>
         <p type="Nombre:"><input v-model="nombre" type="text" /></p>
         <p type="Apellido:"><input v-model="apellido" type="text" /></p>
-        <p type="Cedula:"><input v-model="cedula" type="text" /></p>
+        <p type="Cedula:"><input v-model="cedula" type="text" @blur="verificarCedula" /></p>
         <p type="Direccion:"><input v-model="direccion" type="text" /></p>
         <p type="Telefono:"><input v-model="telefono" type="text" /></p>
         <p type="Rol:">
@@ -23,10 +23,14 @@
         <p type="Fecha Nacimiento:">
           <input v-model="fechaNacimiento" type="date" />
         </p>
-        <button @click="insertar">Registrarse</button>
+        <button @click.prevent="insertar">Registrarse</button>
         <!-- Mensaje de registro exitoso -->
         <p v-if="registroExitoso" class="registro-exitoso">
           ¡Registro exitoso!
+        </p>
+        <!-- Mensaje de error -->
+        <p v-if="errorCedula" class="error">
+          {{ errorCedula }}
         </p>
       </form>
     </div>
@@ -46,41 +50,44 @@ export default {
       rol: null,
       fechaNacimiento: null,
       registroExitoso: false,
+      errorCedula: null,
+      cedulasIngresadas: [], // Lista para almacenar cédulas ya ingresadas
     };
   },
   methods: {
     async insertar() {
-      if (
-        this.nombre &&
-        this.apellido &&
-        this.cedula &&
-        this.direccion &&
-        this.telefono &&
-        this.rol !== "" &&
-        this.fechaNacimiento
-      ) {
-        if (this.cedula.length === 10) {
-          const fechaFormateada = new Date(this.fechaNacimiento).toISOString();
-
-          console.log(fechaFormateada);
-          const pacBody = {
-            nombre: this.nombre,
-            apellido: this.apellido,
-            cedula: this.cedula,
-            direccion: this.direccion,
-            telefono: this.telefono,
-            rol: this.rol,
-            fechaNacimiento: fechaFormateada,
-          };
+      // Verificar si la cédula ya está registrada antes de enviarla al servidor
+      if (this.cedula && !this.cedulasIngresadas.includes(this.cedula)) {
+        const fechaFormateada = new Date(this.fechaNacimiento).toISOString();
+        const pacBody = {
+          nombre: this.nombre,
+          apellido: this.apellido,
+          cedula: this.cedula,
+          direccion: this.direccion,
+          telefono: this.telefono,
+          rol: this.rol,
+          fechaNacimiento: fechaFormateada,
+        };
+        try {
           await insertarfachada(pacBody);
           // Registro exitoso
           this.registroExitoso = true;
           this.resetearDatos();
-        } else {
-          alert("La cédula debe tener exactamente 10 dígitos.");
+        } catch (error) {
+          console.error("Error al registrar:", error);
+          alert("Hubo un error al registrar. Inténtelo de nuevo.");
         }
       } else {
-        alert("Por favor, complete todos los campos antes de registrarse.");
+        // Mostrar mensaje de error si la cédula ya está registrada
+        this.errorCedula = "¡Esta cédula ya está registrada o no es válida!";
+      }
+    },
+    verificarCedula() {
+      this.errorCedula = null;
+      // Verificar si la cédula ya está en la lista
+      if (this.cedula && this.cedulasIngresadas.includes(this.cedula)) {
+        // Mostrar mensaje de error
+        this.errorCedula = "¡Esta cédula ya está registrada!";
       }
     },
     resetearDatos() {
@@ -94,7 +101,6 @@ export default {
       this.fechaNacimiento = null;
 
       // Ocultar el mensaje de registro exitoso
-      //me va a servir para modificar 
       this.registroExitoso = false;
     },
   },
@@ -107,20 +113,16 @@ export default {
   width: 100vw;
   max-height: 100%;
   max-width: 100%;
-  /* position : fixed =este estilo realiza como si estuviera flotando y no sobrepone a ningun elemento como una marca de agua */
   position: fixed;
-  /* para garantizar que empieze desde los bordes toca poner top:0px y left:0px*/
   top: 0px;
   left: 0px;
   background-color: rgb(56, 119, 160);
 }
-
 .container {
   display: grid;
   justify-content: center;
   align-items: center;
 }
-
 .form {
   align-items: center;
   width: 400px;
@@ -131,25 +133,20 @@ export default {
   box-shadow: 0px 0px 40px -10px #000;
   padding: 10px;
 }
-
 img {
   display: grid;
   justify-content: center;
   align-items: center;
   width: 404px;
   height: 700px;
-  /* Asegura que la imagen ocupe todo el espacio disponible */
-  /* Aplica un filtro de desenfoque a la imagen */
   opacity: 0.5;
   position: fixed;
 }
-
 h1 {
   padding-left: 50px;
   color: white;
   border-bottom: 3px solid #78788c;
 }
-
 h2 {
   margin-left: 90px;
   padding-bottom: 10px;
@@ -157,11 +154,9 @@ h2 {
   font-size: 35px;
   position: relative;
 }
-
 p {
   position: relative;
 }
-
 p:before {
   content: attr(type);
   display: flex;
@@ -169,7 +164,6 @@ p:before {
   font-size: 25px;
   color: #000000;
 }
-
 input {
   width: 100%;
   border: 0;
@@ -177,11 +171,9 @@ input {
   box-shadow: 30px 20px 40px -8px #000;
   position: relative;
 }
-
 input:focus {
   border-bottom: 3px solid #78788c;
 }
-
 button {
   width: 125px;
   height: 40px;
@@ -197,6 +189,10 @@ select {
 .registro-exitoso {
   color: green;
   font-weight: bold;
+  position: relative;
+}
+.error {
+  color: red;
   position: relative;
 }
 </style>

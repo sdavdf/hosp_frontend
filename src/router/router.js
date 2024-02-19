@@ -1,6 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
+    { path: "/", component: ()=> import('../page/PaginaInicio') },
+    { path: "/quienes-somos", component: ()=> import('../page/QuienesSomos') },
     {
         path: '/registrar',
         component: () => import('../page/PaginaRegistro')

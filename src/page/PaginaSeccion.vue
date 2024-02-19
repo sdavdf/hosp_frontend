@@ -1,27 +1,62 @@
 <template>
-<div class="body">
- <div class="container">
-        <header>
-            <h1>Bienvenidos</h1>
-        </header>
+  <div class="body">
+    <div class="container">
+      <header>
+        <h1>Bienvenidos</h1>
+      </header>
 
-        <form class="form" >
-            <img src="../assets/imgHospital1.jpg" alt="">
-            <h2>LOGIN</h2>
-            <p type="Cedula:"> <input type="text"> </p>
-            <p type="Contraseña:"><input type="text"></p>
-            <button>Ingresar </button>
-            <button><router-link to="/registrar">Registrarse </router-link></button>
-        </form>
-
+      <form
+        form
+        class="form"
+        @submit.prevent="login"
+        :class="{ loading: isLoading }"
+      >
+        <img src="../assets/imgHospital1.jpg" alt="" />
+        <h2>LOGIN</h2>
+        <p type="Cedula:"><input type="text" /></p>
+        <p type="Contraseña:"><input type="text" /></p>
+        <button>Ingresar</button>
+        <button><router-link to="/registrar">Registrarse </router-link></button>
+      </form>
     </div>
-</div>
+  </div>
 </template>
 
 <script>
-export default {
+import { insertarfachada } from "../helpers/clientePaciente.js";
 
-}
+export default {
+  data() {
+    return {
+      cedula: "",
+      contrasena: "",
+      isLoading: false, // Propiedad para indicar si la solicitud está en progreso
+    };
+  },
+  methods: {
+    async login() {
+      try {
+        if (!this.cedula || !this.contrasena) {
+          throw new Error("Por favor, complete todos los campos.");
+        }
+
+        this.isLoading = true;
+
+        await insertarfachada(
+          { cedula: this.cedula, contrasena: this.contrasena },
+          this
+        );
+
+        alert("Inicio de sesión exitoso. Bienvenido de nuevo.");
+      } catch (error) {
+        console.error("Error de inicio de sesión:", error);
+        alert("Credenciales incorrectas. Inténtelo de nuevo.");
+      } finally {
+        this.isLoading = false;
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -30,9 +65,7 @@ export default {
   width: 100vw;
   max-height: 100%;
   max-width: 100%;
-  /* position : fixed =este estilo realiza como si estuviera flotando y no sobrepone a ningun elemento como una marca de agua */
   position: fixed;
-  /* para garantizar que empieze desde los bordes toca poner top:0px y left:0px*/
   top: 0px;
   left: 0px;
   background-color: rgb(56, 119, 160);
@@ -60,8 +93,6 @@ img {
   align-items: center;
   width: 400px;
   height: 450px;
-  /* Asegura que la imagen ocupe todo el espacio disponible */
-  /* Aplica un filtro de desenfoque a la imagen */
   opacity: 0.5;
   position: fixed;
 }

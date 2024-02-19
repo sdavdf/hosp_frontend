@@ -4,29 +4,27 @@
       <div>
         <img id="imagen2" src="../assets/imglogo2.jpg" alt="no hay" />
       </div>
-      <div class="containerOpcion">
-        <ul>
-          <li>INICIO</li>
-          <li>QUIENES SOMOS</li>
-          <li>DOCUMENTOS</li>
-          <li>INFORMACION</li>
-        </ul>
-      </div>
+
+      <NavbarInicio/>
+      
       <div class="containerButton">
         <button><router-link to="/seccion">INGRESAR </router-link></button>
         <button><router-link to="/registrar">REGISTRAR </router-link></button>
       </div>
     </div>
 
-    <div class="containerimg">
-      <img id="imagen1" src="../assets/imglogo_1.jpg" alt="no funciona" />
-      <img id="imagen3" src="../assets/informacion.jpg" alt="no funciona" />
-    </div>
   </div>
 </template>
 
 <script>
-export default {};
+import NavbarInicio from '../components/NavbarInicio.vue';
+// Importa el componente Navbar
+
+export default {
+  components: {
+    NavbarInicio // Registra el componente Navbar
+  }
+};
 </script>
 
 <style scoped>
@@ -46,17 +44,6 @@ export default {};
   width: 80%;
   height: 120px;
   border-bottom-right-radius: 60px;
-}
-
-.containerOpcion li {
-  display: inline-block;
-  margin: 20px;
-  font: bold 18px verdana;
-  color: rgb(255, 255, 255);
-}
-.containerOpcion {
-  padding-right: 70px;
-  padding-top: 15px;
 }
 
 .containerButton {
@@ -83,31 +70,11 @@ button:hover {
   display: grid;
   text-align: right;
   grid-template-columns: 20% 60% 20%;
-  /*     background-color: rgb(212, 237, 218);
- */
   border-radius: 10px;
   background-color: #007c76;
   box-shadow: 15px 10px 5px 5px #00000033;
 }
 
-/* imagenes movimiento o tiempos */
-@keyframes moverImagen {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(100%);
-  }
-  75% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
 .containerimg {
   position: relative;
   overflow: hidden;
@@ -115,7 +82,6 @@ button:hover {
 #imagen1 {
   width: 100%;
   height: 730px;
-  /* height: auto; */
   animation: moverImagen 20s linear infinite;
   animation-delay: 3s;
 
@@ -134,5 +100,10 @@ button:hover {
   padding-top: 30px;
   padding-bottom: 50px;
   border-bottom-right-radius: 180px;
+}
+
+.button:hover {
+  background-color: greenyellow;
+  color: white;
 }
 </style>
